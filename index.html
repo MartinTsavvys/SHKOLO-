@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a8fd4">
+<title>Дневник</title>
+<style>
+  :root{
+    --blue:#1a8fd4;
+    --blue-dark:#1683c4;
+    --green:#5cb85c;
+    --green2:#4cae4c;
+    --red:#e8543f;
+    --orange:#f0823c;
+    --yellow:#f5b921;
+    --gradeblue:#3a9fe0;
+    --gray:#c9ced3;
+    --line:#e4e7ea;
+    --text:#1c1c1e;
+    --muted:#8a8f94;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:#1c1c1e;
+    color:var(--text);
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;
+  }
+  /* Phone frame (hidden on actual mobile fullscreen) */
+  .phone{
+    position:relative;
+    width:100%;max-width:430px;height:100vh;max-height:932px;
+    background:#fff;overflow:hidden;display:flex;flex-direction:column;
+  }
+  @media(min-width:480px){
+    .phone{border-radius:46px;box-shadow:0 20px 60px rgba(0,0,0,.5);border:12px solid #0a0a0a;height:932px;}
+  }
+
+  /* Status bar */
+  .statusbar{
+    background:var(--blue);color:#fff;flex:0 0 auto;
+    height:54px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px 0 30px;font-weight:600;
+    padding-top:env(safe-area-inset-top);
+  }
+  .statusbar .time{font-size:19px;font-weight:700;letter-spacing:.3px;}
+  .statusbar .right{display:flex;align-items:center;gap:7px;}
+  .sig{display:flex;align-items:flex-end;gap:2px;height:13px;}
+  .sig i{width:3px;background:#fff;border-radius:1px;display:block;}
+  .sig i:nth-child(1){height:5px;opacity:.5}.sig i:nth-child(2){height:7px;opacity:.5}
+  .sig i:nth-child(3){height:9px}.sig i:nth-child(4){height:12px;opacity:.4}
+  .wifi{font-size:15px}
+  .batt{display:flex;align-items:center;gap:2px;}
+  .batt .b{width:26px;height:14px;border:1.5px solid #fff;border-radius:4px;position:relative;display:flex;align-items:center;padding:1.5px;}
+  .batt .b::after{content:"";position:absolute;right:-3px;top:4px;width:2px;height:5px;background:#fff;border-radius:0 1px 1px 0;}
+  .batt .b i{height:100%;width:100%;background:#fff;border-radius:1.5px;}
+  .batt small{font-size:10px;font-weight:700;color:var(--blue);position:absolute;}
+
+  /* Header / topbar */
+  .topbar{
+    background:var(--blue);color:#fff;flex:0 0 auto;
+    height:56px;display:flex;align-items:center;justify-content:center;position:relative;
+  }
+  .topbar .title{font-size:21px;font-weight:600;display:flex;align-items:center;gap:9px;}
+  .topbar .leftbtn{position:absolute;left:18px;top:0;height:56px;display:flex;align-items:center;font-size:18px;font-weight:600;gap:5px;cursor:pointer;}
+  .topbar .rightbtn{position:absolute;right:20px;top:0;height:56px;display:flex;align-items:center;font-size:30px;font-weight:300;cursor:pointer;}
+  .bookicon{font-size:20px}
+
+  /* Sub-tabs (Дневник) */
+  .subtabs{
+    background:var(--blue);color:#fff;flex:0 0 auto;display:flex;
+    padding:4px 4px 8px;
+  }
+  .subtab{flex:1;text-align:center;font-size:12px;opacity:.72;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding:2px 1px;line-height:1.1;}
+  .subtab .ic{font-size:19px;height:22px;display:flex;align-items:center;}
+  .subtab.active{opacity:1;font-weight:600;border-bottom:2.5px solid #fff;padding-bottom:4px;}
+  .subtab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:80px;}
+
+  /* Content */
+  .content{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff;}
+
+  /* Section banner */
+  .banner{
+    background:#f1f3f5;display:flex;align-items:center;justify-content:space-between;
+    padding:15px 18px;color:var(--blue);font-size:17px;font-weight:500;
+    border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .banner.plain{color:var(--blue);}
+  .banner .chev{color:#b8bec4;font-size:20px;}
+
+  /* Subject rows */
+  .srow{padding:16px 18px;border-bottom:1px solid var(--line);}
+  .srow .name{display:flex;align-items:center;gap:9px;font-size:19px;font-weight:600;color:#222;}
+  .srow .name .bk{color:#3a3f44;font-size:17px;}
+  .srow .meta{margin-top:11px;display:flex;align-items:center;gap:18px;font-size:15px;color:var(--muted);flex-wrap:wrap;}
+  .srow .meta .pair{display:flex;align-items:center;gap:8px;}
+  .nomark{margin-top:9px;color:#a7adb3;font-size:15px;}
+
+  /* Badges */
+  .badge{min-width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:600;padding:0 4px;}
+  .b-gray{background:#e6eaed;color:#a8aeb4;}
+  .b-yellow{background:var(--yellow);}
+  .b-orange{background:var(--orange);}
+  .b-red{background:var(--red);}
+  .b-green{background:var(--green);}
+
+  /* Grade circles */
+  .grades{margin-top:12px;display:flex;gap:11px;flex-wrap:wrap;}
+  .g{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:600;}
+  .g2{background:var(--red);}
+  .g3{background:var(--orange);}
+  .g4{background:var(--yellow);}
+  .g5{background:var(--gradeblue);}
+  .g6{background:var(--green);}
+
+  /* Discussions */
+  .drow{display:flex;gap:14px;padding:15px 16px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .avatar{flex:0 0 auto;width:50px;height:50px;border-radius:50%;background:#eceff1;display:flex;align-items:center;justify-content:center;color:#b7bdc3;position:relative;}
+  .avatar svg{width:30px;height:30px;}
+  .avatar .env{position:absolute;left:-2px;bottom:-2px;width:22px;height:22px;background:var(--blue);border-radius:4px;display:flex;align-items:center;justify-content:center;}
+  .avatar .env svg{width:13px;height:13px;}
+  .dbody{flex:1;min-width:0;}
+  .dbody .dt{font-size:17px;font-weight:700;color:#1c1c1e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dbody .dt.reg{font-weight:400;}
+  .dbody .dauthor{font-size:15px;color:#3a3f44;margin-top:3px;}
+  .dbody .dprev{font-size:15px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* Notifications */
+  .nhead{text-align:right;color:var(--blue);font-size:16px;padding:13px 18px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .nrow{display:flex;gap:14px;align-items:flex-start;padding:17px 18px;border-bottom:1px solid var(--line);}
+  .nrow .bell{flex:0 0 auto;color:#3a3f44;font-size:19px;margin-top:1px;}
+  .nrow .ntext{font-size:17px;color:#1c1c1e;line-height:1.3;}
+  .nrow.unread .ntext{font-weight:700;}
+
+  /* Student picker */
+  .pickhead{background:#f1f3f5;color:#7c8288;font-size:14px;font-weight:600;letter-spacing:.5px;padding:13px 18px;border-bottom:1px solid var(--line);}
+  .pickrow{display:flex;align-items:center;gap:15px;padding:17px 18px;border-bottom:1px solid var(--line);cursor:pointer;font-size:21px;color:#1c1c1e;}
+  .pickrow .pic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#1c1c1e;}
+
+  /* Bottom nav */
+  .tabbar{
+    flex:0 0 auto;display:flex;background:#fff;border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 0 7px;color:#9aa0a6;font-size:12px;cursor:pointer;position:relative;}
+  .tab.active{color:var(--blue);}
+  .tab .tic{font-size:23px;height:26px;display:flex;align-items:center;}
+  .tab .nbadge{position:absolute;top:4px;left:54%;background:var(--red);color:#fff;font-size:11px;font-weight:700;min-width:20px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+
+  .empty{padding:40px 18px;text-align:center;color:#a7adb3;font-size:16px;}
+  .hide{display:none!important;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- STATUS BAR -->
+  <div class="statusbar">
+    <div class="time">10:08</div>
+    <div class="right">
+      <div class="sig"><i></i><i></i><i></i><i></i></div>
+      <div class="wifi">&#128246;</div>
+      <div class="batt"><div class="b"><i></i></div></div>
+    </div>
+  </div>
+
+  <!-- TOPBAR (changes per screen) -->
+  <div class="topbar" id="topbar"></div>
+
+  <!-- SUBTABS (Дневник only) -->
+  <div class="subtabs hide" id="subtabs"></div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content"></div>
+
+  <!-- BOTTOM NAV -->
+  <div class="tabbar" id="tabbar"></div>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+
+// Absences: [late(Закъс), unexcused(Неуваж), excused(Уваж)]
+const absences = [
+  {n:"ОБЩО", v:[9,16,250], strong:true},
+  {n:"Български език и литература", v:[0,0,22]},
+  {n:"Английски език", v:[0,0,10]},
+  {n:"Руски език", v:[1,0,13]},
+  {n:"Математика", v:[0,0,20]},
+  {n:"Гражданско образование", v:[2,2,5]},
+  {n:"Физическо възпитание и спорт", v:[6,0,17]},
+  {n:"Английски език (ИУЧ - ПП)", v:[0,0,0]},
+];
+
+// Grades — Bulgarian 2..6
+const grades = [
+  {n:"Български език и литература", g:[2]},
+  {n:"Английски език", g:[5,6,6,2]},
+  {n:"Руски език", g:[5,6,6,6]},
+  {n:"Математика", g:[4,2]},
+  {n:"Гражданско образование", g:[3,6,4]},
+  {n:"Физическо възпитание и спорт", g:[5,3,5,6,6]},
+  {n:"Английски език (ИУЧ - ПП)", g:[]},
+  {n:"МОДУЛ 1 - Устно общуване (ИУЧ - ПП (зад. модул)) (Английски език)", g:[6,6]},
+  {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Английски език)", g:[]},
+  {n:"МОДУЛ 3 - Езикът чрез литературата (ИУЧ - ПП (зад. модул)) (Английски език)", g:[5,4]},
+  {n:"МОДУЛ 4 - Култура и междукултурно общуване (ИУЧ - ПП (зад. модул)) (Английски език)", g:[5,6]},
+  {n:"Английски език чрез културно-творческо интегрирано обучение (ИУЧ - ПП (изб. модул)) (Английски език)", g:[6]},
+  {n:"Руски език (ИУЧ - ПП)", g:[]},
+  {n:"МОДУЛ 1 - Устно общуване (ИУЧ - ПП (зад. модул)) (Руски език)", g:[5,6]},
+  {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Руски език)", g:[]},
+  {n:"Руски фолклор и традиции (ИУЧ - ПП (изб. модул)) (Руски език)", g:[6,6]},
+  {n:"История и цивилизации (ИУЧ - ПП)", g:[]},
+  {n:"МОДУЛ 1 - Власт и институции (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[5,6]},
+  {n:"МОДУЛ 2 - Култура и духовност (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[5]},
+  {n:"МОДУЛ 3 - Човек и общество (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[]},
+  {n:"Държави, общества и култури от Античността до Новото време (ИУЧ - ПП (изб. модул)) (История и цивилизации)", g:[6,6]},
+  {n:"Български език и литература (ИУЧ - РП/УП-А)", g:[]},
+  {n:"Спортни дейности (волейбол) (...)", g:[]},
+  {n:"Безопасност на движението (...)", g:[]},
+  {n:"Час на класа (...)", g:[]},
+];
+
+// Reviews: [praise(Похвали), remarks(Забележки)]
+const reviews = [
+  {n:"ОБЩО", v:[11,19], strong:true},
+  {n:"Общи отзиви", v:[0,0]},
+  {n:"Български език и литература", v:[1,2]},
+  {n:"Английски език", v:[0,4]},
+  {n:"Руски език", v:[0,3]},
+  {n:"Математика", v:[0,1]},
+  {n:"Гражданско образование", v:[3,4]},
+  {n:"Физическо възпитание и спорт", v:[0,2]},
+  {n:"Английски език (ИУЧ - ПП)", v:[0,0]},
+  {n:"МОДУЛ 1 - Устно общуване (ИУЧ - ПП (зад. модул)) (Английски език)", v:[0,0]},
+  {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Английски език)", v:[0,0]},
+  {n:"МОДУЛ 3 - Езикът чрез литературата (ИУЧ - ПП (зад. модул)) (Английски език)", v:[0,0]},
+  {n:"МОДУЛ 4 - Култура и междукултурно общуване (ИУЧ - ПП (зад. модул)) (Английски език)", v:[0,0]},
+  {n:"Английски език чрез културно-творческо интегрирано обучение (ИУЧ - ПП (изб. модул)) (Английски език)", v:[1,0]},
+  {n:"Руски език (ИУЧ - ПП)", v:[0,0]},
+  {n:"МОДУЛ 1 - Устно общуване (ИУЧ - ПП (зад. модул)) (Руски език)", v:[0,0]},
+  {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Руски език)", v:[0,0]},
+  {n:"Руски фолклор и традиции (ИУЧ - ПП (изб. модул)) (Руски език)", v:[1,0]},
+  {n:"История и цивилизации (ИУЧ - ПП)", v:[0,0]},
+  {n:"МОДУЛ 1 - Власт и институции (ИУЧ - ПП (зад. модул)) (История и цивилизации)", v:[4,1]},
+  {n:"МОДУЛ 2 - Култура и духовност (ИУЧ - ПП (зад. модул)) (История и цивилизации)", v:[0,0]},
+  {n:"МОДУЛ 3 - Човек и общество (ИУЧ - ПП (зад. модул)) (История и цивилизации)", v:[1,2]},
+  {n:"Държави, общества и култури от Античността до Новото време (ИУЧ - ПП (изб. модул)) (История и цивилизации)", v:[0,0]},
+  {n:"Български език и литература (ИУЧ - РП/УП-А)", v:[0,0]},
+  {n:"Спортни дейности (волейбол) (...)", v:[0,0]},
+  {n:"Безопасност на движението (...)", v:[0,0]},
+  {n:"Час на класа (...)", v:[0,0]},
+];
+
+const discussions = [
+  {t:"Профил История.", author:"Петър Янев", prev:"За утре Теодора и Виктория ще представят...", env:true, strong:true},
+  {t:"(Ученици- 11А) Условна вероятност", author:"Тинка Бонина-Христова", prev:"Теорема за умножение на възможности", env:true, strong:true},
+  {t:"Госпожо, беше ku деудобно da ви ка...", author:"Мартин Стоилов", prev:"Благодаря", env:false, strong:false},
+  {t:"Учебни часове - петък, 12.06.2026...", author:"Пламен Борисов", prev:"Уважаеми родители, ученици и колеги,Учеб...", env:true, strong:true},
+  {t:"Оссъствие от класно", author:"Мартин Стоилов", prev:"Върнах се госпожо, на училище съм!", env:false, strong:false},
+  {t:"За 4 - 12 клас - Патронен празник н...", author:"Пламен Борисов", prev:"Уважаеми ученици, родители и учители,Във...", env:true, strong:true},
+  {t:"Избор на членове на Съвета на дец...", author:"Пламен Борисов", prev:"За сведение - в приложения файл.", env:true, strong:true},
+  {t:"Избор на нов състав на Консултати...", author:"Пламен Борисов", prev:"", env:true, strong:true},
+];
+
+const notifs = [
+  {t:"Ново отсъствие по М3 - Човек и общество", unread:true},
+  {t:"Ново отсъствие по М2 - Писмено общуване РЕ", unread:true},
+  {t:"Предстоящо събитие: Контролна/класна работа по Руски - Мария Новоселцева", unread:false},
+  {t:"Ново отсъствие по М2 - Култура и духовност", unread:true},
+  {t:"Ново отсъствие по Английски език чрез културно-тво", unread:true},
+  {t:"Ново отсъствие по М2 - Писмено общуване АЕ", unread:true},
+  {t:"Ново отсъствие по Английски език чрез културно-тво", unread:true},
+  {t:"Профил История.", unread:true},
+  {t:"(Ученици- 11А) Условна вероятност", unread:true},
+  {t:"(Ученици- 11А) Условна вероятност", unread:true},
+  {t:"Ново отсъствие по М4 - Култура и междукултурно АЕ", unread:false},
+  {t:"Учебни часове - петък, 12.06.2026 г., ВТОРА СМЯНА", unread:true},
+];
+
+/* ============ STATE ============ */
+let state = { tab:"diary", sub:"abs", picked:true };
+// tab: picker | diary | disc | notif | more
+// sub (diary): abs | grades | rev | sched | hw
+
+/* ============ ICONS ============ */
+const ic = {
+  book:'&#128216;',
+  diary:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h13a2 2 0 012 2v14H6a2 2 0 01-2-2V4z"/><path d="M4 4v14" /><path d="M7 3v3M9 3v3M11 3v3"/></svg>',
+  chat:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-8.5 8.5 8.5 8.5 0 01-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 01-.9-3.8 8.5 8.5 0 018.5-8.5 8.38 8.38 0 018.5 8.5z"/></svg>',
+  bell:'<svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>',
+  more:'<svg width="24" height="6" viewBox="0 0 24 6" fill="currentColor"><circle cx="3" cy="3" r="2.6"/><circle cx="12" cy="3" r="2.6"/><circle cx="21" cy="3" r="2.6"/></svg>',
+  bellline:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>',
+  person:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  envelope:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  childfig:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="4.5" r="2.5"/><path d="M5 9h14v2.5h-4.5L17 21h-2.7l-2.3-6-2.3 6H7l2.5-9.5H5z"/></svg>',
+  bk:'&#128214;'
+};
+
+/* ============ HELPERS ============ */
+function absBadge(val, kind){
+  if(val===0) return `<span class="badge b-gray">0</span>`;
+  let cls = kind==='late' ? 'b-yellow' : kind==='unex' ? 'b-red' : 'b-green';
+  return `<span class="badge ${cls}">${val}</span>`;
+}
+function revBadge(val, kind){
+  if(val===0) return `<span class="badge b-gray">0</span>`;
+  let cls = kind==='praise' ? 'b-green' : 'b-orange';
+  return `<span class="badge ${cls}">${val}</span>`;
+}
+
+/* ============ RENDER TOPBAR + SUBTABS ============ */
+function renderChrome(){
+  const tb = document.getElementById('topbar');
+  const st = document.getElementById('subtabs');
+
+  if(state.tab==='picker'){
+    tb.innerHTML = `<div class="title"><span class="bookicon">${ic.book}</span> Дневник</div>`;
+    st.classList.add('hide');
+  } else if(state.tab==='diary'){
+    tb.innerHTML = `<div class="leftbtn" onclick="goPicker()">MC1 &#9662;</div>
+      <div class="title"><span class="bookicon">${ic.book}</span> Дневник</div>`;
+    st.classList.remove('hide');
+    const subs = [
+      {k:'abs', label:'Отсъствия', i:'&#9888;'},
+      {k:'grades', label:'Оценки', i:'&#9998;'},
+      {k:'rev', label:'Отзиви', i:'&#127894;'},
+      {k:'sched', label:'Разписание', i:'&#128340;'},
+      {k:'hw', label:'Домашна р...', i:'&#128278;'},
+    ];
+    st.innerHTML = subs.map(s=>`<div class="subtab ${state.sub===s.k?'active':''}" onclick="setSub('${s.k}')">
+      <div class="ic">${s.i}</div><span>${s.label}</span></div>`).join('');
+  } else if(state.tab==='disc'){
+    tb.innerHTML = `<div class="title">${ic.chat} Дискусии</div><div class="rightbtn">+</div>`;
+    st.classList.add('hide');
+  } else if(state.tab==='notif'){
+    tb.innerHTML = `<div class="title">${ic.bellline} Известия</div>`;
+    st.classList.add('hide');
+  } else if(state.tab==='more'){
+    tb.innerHTML = `<div class="title">Още</div>`;
+    st.classList.add('hide');
+  }
+}
+
+/* ============ RENDER CONTENT ============ */
+function renderContent(){
+  const c = document.getElementById('content');
+  c.scrollTop = 0;
+  let h = '';
+
+  if(state.tab==='picker'){
+    h = `<div class="pickhead">ИЗБЕРИ</div>
+      <div class="pickrow" onclick="goDiary()">
+        <span class="pic">${ic.childfig}</span> Мартин Стоилов 11А
+      </div>`;
+  }
+  else if(state.tab==='diary' && state.sub==='abs'){
+    h = `<div class="banner plain">Бележки <span class="chev">&#8250;</span></div>`;
+    h += absences.map(s=>`
+      <div class="srow">
+        <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
+        <div class="meta">
+          <span class="pair">Закъс. ${absBadge(s.v[0],'late')}</span>
+          <span class="pair">Неуваж. ${absBadge(s.v[1],'unex')}</span>
+          <span class="pair">Уваж. ${absBadge(s.v[2],'exc')}</span>
+        </div>
+      </div>`).join('');
+  }
+  else if(state.tab==='diary' && state.sub==='grades'){
+    h = `<div class="banner">Втори Срок <span class="chev">&#9662;</span></div>`;
+    h += grades.map(s=>`
+      <div class="srow">
+        <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
+        ${s.g.length ? `<div class="grades">${s.g.map(x=>`<span class="g g${x}">${x}</span>`).join('')}</div>`
+                     : `<div class="nomark">Няма оценки</div>`}
+      </div>`).join('');
+  }
+  else if(state.tab==='diary' && state.sub==='rev'){
+    h = reviews.map(s=>`
+      <div class="srow">
+        <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
+        <div class="meta">
+          <span class="pair">Похвали ${revBadge(s.v[0],'praise')}</span>
+          <span class="pair">Забележки ${revBadge(s.v[1],'rem')}</span>
+        </div>
+      </div>`).join('');
+  }
+  else if(state.tab==='diary' && state.sub==='sched'){
+    h = `<div class="banner">Втори Срок <span class="chev">&#9662;</span></div>
+         <div class="empty">Няма разписание за показване.</div>`;
+  }
+  else if(state.tab==='diary' && state.sub==='hw'){
+    h = `<div class="empty">Няма зададени домашни работи.</div>`;
+  }
+  else if(state.tab==='disc'){
+    h = `<div style="padding:12px 14px;background:#f1f3f5;border-bottom:1px solid var(--line);">
+          <div style="display:flex;align-items:center;background:#fff;border-radius:11px;padding:11px 14px;color:#9aa0a6;font-size:16px;border:1px solid #e1e5e8;">
+            <span style="margin-right:9px;">&#128269;</span> Търсене по тема
+            <span style="margin-left:auto;color:#b8bec4;">&#9662;</span>
+            <span style="margin-left:14px;color:#6b7177;">&#9776;</span>
+          </div>
+        </div>`;
+    h += discussions.map(d=>`
+      <div class="drow">
+        <div class="avatar">${ic.person}${d.env?`<span class="env">${ic.envelope}</span>`:''}</div>
+        <div class="dbody">
+          <div class="dt ${d.strong?'':'reg'}">${d.t}</div>
+          <div class="dauthor">${d.author}</div>
+          ${d.prev?`<div class="dprev">${d.prev}</div>`:''}
+        </div>
+      </div>`).join('');
+  }
+  else if(state.tab==='notif'){
+    h = `<div class="nhead">Маркирай всички като прочетени</div>`;
+    h += notifs.map(n=>`
+      <div class="nrow ${n.unread?'unread':''}">
+        <span class="bell">&#128276;</span>
+        <div class="ntext">${n.t}</div>
+      </div>`).join('');
+  }
+  else if(state.tab==='more'){
+    const items = ["Профил","Бележник","Заявления","Бюджет","Настройки","Помощ","Изход"];
+    h = items.map(x=>`<div class="srow"><div class="name" style="font-weight:500;font-size:18px;">${x}</div></div>`).join('');
+  }
+
+  c.innerHTML = h;
+}
+
+/* ============ BOTTOM NAV ============ */
+function renderTabbar(){
+  const tabs = [
+    {k:'diary', label:'Дневник', i:ic.diary},
+    {k:'disc', label:'Дискусии', i:ic.chat},
+    {k:'notif', label:'Известия', i:ic.bell, badge:'9+'},
+    {k:'more', label:'Още', i:ic.more},
+  ];
+  const cur = state.tab==='picker' ? 'diary' : state.tab;
+  document.getElementById('tabbar').innerHTML = tabs.map(t=>`
+    <div class="tab ${cur===t.k?'active':''}" onclick="setTab('${t.k}')">
+      <div class="tic">${t.i}</div>
+      ${t.badge?`<span class="nbadge">${t.badge}</span>`:''}
+      <span>${t.label}</span>
+    </div>`).join('');
+}
+
+/* ============ NAV ACTIONS ============ */
+function render(){ renderChrome(); renderContent(); renderTabbar(); }
+function setTab(k){
+  if(k==='diary'){ state.tab = state.picked ? 'diary' : 'picker'; }
+  else state.tab = k;
+  render();
+}
+function setSub(k){ state.sub = k; render(); }
+function goPicker(){ state.tab='picker'; render(); }
+function goDiary(){ state.picked=true; state.tab='diary'; state.sub='abs'; render(); }
+
+/* init */
+render();
+</script>
+</body>
+</html>
