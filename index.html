@@ -59,7 +59,7 @@
     height:56px;display:flex;align-items:center;justify-content:center;position:relative;
   }
   .topbar .title{font-size:21px;font-weight:600;display:flex;align-items:center;gap:9px;}
-  .topbar .leftbtn{position:absolute;left:18px;top:0;height:56px;display:flex;align-items:center;font-size:18px;font-weight:600;gap:5px;cursor:pointer;}
+  .topbar .leftbtn{position:absolute;left:18px;top:0;height:100%;display:flex;align-items:center;font-size:18px;font-weight:600;gap:5px;cursor:pointer;}
   .topbar .rightbtn{position:absolute;right:20px;top:0;height:56px;display:flex;align-items:center;font-size:30px;font-weight:300;cursor:pointer;}
   .bookicon{font-size:20px}
 
@@ -109,6 +109,37 @@
   .g4{background:var(--yellow);}
   .g5{background:var(--gradeblue);}
   .g6{background:var(--green);}
+
+  /* Period picker page (Избери) */
+  .prow{display:flex;align-items:center;justify-content:space-between;padding:18px 18px;border-bottom:1px solid var(--line);font-size:20px;font-weight:600;color:#1c1c1e;cursor:pointer;}
+  .prow.sel{color:var(--blue);}
+  .prow .mark{color:var(--blue);font-size:26px;font-weight:300;line-height:1;}
+
+  /* Annual (Срочни/годишни) columns */
+  .annual{display:flex;align-items:center;margin-top:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap;scrollbar-width:none;}
+  .annual::-webkit-scrollbar{display:none;}
+  .acol{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+  .acol .alabel{font-size:15px;color:var(--muted);}
+  .asep{width:1px;height:24px;background:#e1e5e8;margin:0 15px;flex:0 0 auto;}
+  .gsm{width:30px;height:30px;font-size:15px;}
+  .gempty{background:#e6eaed;}
+
+  /* Grade detail screen */
+  .srow.tap{cursor:pointer;}
+  .topbar.tall{height:74px;}
+  .dtitle{text-align:center;color:#fff;}
+  .dtitle .l1{font-size:18px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .dtitle .l1 svg{width:16px;height:16px;fill:#fff;}
+  .dtitle .l2{font-size:14px;font-weight:400;margin-top:3px;opacity:.97;}
+  .dhead{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;}
+  .dhead .lab{color:var(--blue);font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+  .dgap{height:14px;background:#eceff1;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .drowg{display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--line);}
+  .drowg .info{flex:1;min-width:0;}
+  .drowg .ttl{font-size:19px;color:#1c1c1e;}
+  .drowg .dt{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:15px;margin-top:5px;}
+  .drowg .dt svg{width:15px;height:15px;stroke:var(--muted);}
+  .drowg .dchev{color:#c5cbd1;font-size:20px;}
 
   /* Discussions */
   .drow{display:flex;gap:14px;padding:15px 16px;border-bottom:1px solid var(--line);cursor:pointer;}
@@ -185,10 +216,10 @@ const absences = [
 
 // Grades — Bulgarian 2..6
 const grades = [
-  {n:"Български език и литература", g:[4,5]},
-  {n:"Английски език", g:[5,6,6]},
+  {n:"Български език и литература", g:[4,5,4,5]},
+  {n:"Английски език", g:[5,6,6,5,5]},
   {n:"Руски език", g:[5,6,6,6]},
-  {n:"Математика", g:[4,5]},
+  {n:"Математика", g:[4,5,4,6]},
   {n:"Гражданско образование", g:[3,6,4]},
   {n:"Физическо възпитание и спорт", g:[5,3,5,6,6]},
   {n:"Английски език (ИУЧ - ПП)", g:[]},
@@ -196,21 +227,98 @@ const grades = [
   {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Английски език)", g:[]},
   {n:"МОДУЛ 3 - Езикът чрез литературата (ИУЧ - ПП (зад. модул)) (Английски език)", g:[5,4]},
   {n:"МОДУЛ 4 - Култура и междукултурно общуване (ИУЧ - ПП (зад. модул)) (Английски език)", g:[5,6]},
-  {n:"Английски език чрез културно-творческо интегрирано обучение (ИУЧ - ПП (изб. модул)) (Английски език)", g:[6]},
+  {n:"Английски език чрез културно-творческо интегрирано обучение (ИУЧ - ПП (изб. модул)) (Английски език)", g:[6,6,6,6]},
   {n:"Руски език (ИУЧ - ПП)", g:[]},
-  {n:"МОДУЛ 1 - Устно общуване (ИУЧ - ПП (зад. модул)) (Руски език)", g:[5,6]},
-  {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Руски език)", g:[]},
+  {n:"МОДУЛ 1 - Устно общуване (ИУЧ - ПП (зад. модул)) (Руски език)", g:[5,6,6]},
+  {n:"МОДУЛ 2 - Писмено общуване (ИУЧ - ПП (зад. модул)) (Руски език)", g:[6,6,5]},
   {n:"Руски фолклор и традиции (ИУЧ - ПП (изб. модул)) (Руски език)", g:[6,6]},
   {n:"История и цивилизации (ИУЧ - ПП)", g:[]},
   {n:"МОДУЛ 1 - Власт и институции (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[5,6]},
   {n:"МОДУЛ 2 - Култура и духовност (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[5]},
-  {n:"МОДУЛ 3 - Човек и общество (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[]},
+  {n:"МОДУЛ 3 - Човек и общество (ИУЧ - ПП (зад. модул)) (История и цивилизации)", g:[4,5]},
   {n:"Държави, общества и култури от Античността до Новото време (ИУЧ - ПП (изб. модул)) (История и цивилизации)", g:[6,6]},
-  {n:"Български език и литература (ИУЧ - РП/УП-А)", g:[]},
+  {n:"Български език и литература (ИУЧ - РП/УП-А)", g:[4,5]},
   {n:"Спортни дейности (волейбол) (...)", g:[]},
   {n:"Безопасност на движението (...)", g:[]},
   {n:"Час на класа (...)", g:[]},
 ];
+
+// Срочни/годишни — aligned 1:1 with `grades` order. {ps:Първи срок, vs:Втори срок, g:Годишна}
+const annual = [
+  {ps:5,   vs:5,   g:5},    // Български език и литература
+  {ps:6,   vs:5,   g:6},    // Английски език
+  {ps:4,   vs:6,   g:6},    // Руски език
+  {ps:5,   vs:5,   g:5},    // Математика
+  {ps:4,   vs:4,   g:4},    // Гражданско образование
+  {ps:5,   vs:5,   g:5},    // Физическо възпитание и спорт
+  {ps:null,vs:null,g:5},    // Английски език (ИУЧ - ПП)
+  {ps:6,   vs:6,   g:6},    // М1 Устно общуване (Англ)
+  {ps:5,   vs:5,   g:5},    // М2 Писмено общуване (Англ)
+  {ps:6,   vs:4,   g:5},    // М3 Езикът чрез литературата (Англ)
+  {ps:4,   vs:6,   g:5},    // М4 Култура и междукултурно (Англ)
+  {ps:6,   vs:6,   g:6},    // Англ. чрез културно-творческо (изб)
+  {ps:null,vs:null,g:6},    // Руски език (ИУЧ - ПП)
+  {ps:4,   vs:6,   g:6},    // М1 Устно общуване (Руски)
+  {ps:6,   vs:6,   g:6},    // М2 Писмено общуване (Руски)
+  {ps:6,   vs:6,   g:6},    // Руски фолклор и традиции (изб)
+  {ps:null,vs:null,g:6},    // История и цивилизации (ИУЧ - ПП)
+  {ps:6,   vs:6,   g:6},    // М1 Власт и институции (История)
+  {ps:6,   vs:5,   g:6},    // М2 Култура и духовност (История)
+  {ps:6,   vs:5,   g:5},    // М3 Човек и общество (История)
+  {ps:6,   vs:6,   g:6},    // Държави, общества и култури (изб)
+  {ps:4,   vs:5,   g:5},    // Български език и литература (ИУЧ - РП/УП-А)
+  {ps:null,vs:null,g:null}, // Спортни дейности (волейбол)
+  {ps:null,vs:null,g:null}, // Безопасност на движението
+  {ps:null,vs:null,g:null}, // Час на класа
+];
+
+// Първи срок — отделни оценки, оформят се към срочните по-горе. Aligned 1:1 with `grades`.
+const firstTerm = [
+  [5,4,6,5,5],   // Български език и литература → 5
+  [6,6,5,6],     // Английски език → 6
+  [4,4,5,3],     // Руски език → 4
+  [5,5,4,6,5],   // Математика → 5
+  [4,4,3,5],     // Гражданско образование → 4
+  [5,6,5,4,6],   // Физическо възпитание и спорт → 5
+  [],            // Английски език (ИУЧ - ПП)
+  [6,6],         // М1 Устно общуване (Англ) → 6
+  [5,5],         // М2 Писмено общуване (Англ) → 5
+  [6,6],         // М3 Езикът чрез литературата (Англ) → 6
+  [4,4],         // М4 Култура и междукултурно (Англ) → 4
+  [6,6],         // Англ. чрез културно-творческо (изб) → 6
+  [],            // Руски език (ИУЧ - ПП)
+  [4,4],         // М1 Устно общуване (Руски) → 4
+  [6,6],         // М2 Писмено общуване (Руски) → 6
+  [6,6],         // Руски фолклор и традиции (изб) → 6
+  [],            // История и цивилизации (ИУЧ - ПП)
+  [6,6],         // М1 Власт и институции (История) → 6
+  [6,6],         // М2 Култура и духовност (История) → 6
+  [6,6],         // М3 Човек и общество (История) → 6
+  [6,6],         // Държави, общества и култури (изб) → 6
+  [4,4,5],       // Български език и литература (ИУЧ - РП/УП-А) → 4
+  [],            // Спортни дейности (волейбол)
+  [],            // Безопасност на движението
+  [],            // Час на класа
+];
+
+// Build per-subject detail: each grade linked to an assessment type + date.
+const _pool2 = ["Практическо изпитване","Проект","Класна работа","Писмено изпитване","Устно изпитване","Тест","Контролна работа","Активно участие","Домашна работа"];
+const _pool1 = ["Тест","Класна работа","Активно участие","Домашна работа","Писмено изпитване","Практическо изпитване","Устно изпитване","Междинно равнище","Контролна работа"];
+function _entries(arr,pool,endY,endM,endD,i){
+  const r=[]; let d=new Date(endY,endM-1,endD-(i%6)*2);
+  for(let k=0;k<arr.length;k++){
+    const t=pool[(i+k)%pool.length];
+    const dd=String(d.getDate()).padStart(2,'0'), mm=String(d.getMonth()+1).padStart(2,'0');
+    r.push({g:arr[k],type:t,date:`${dd}.${mm}.${d.getFullYear()}`});
+    d=new Date(d.getTime()-((12+((i+k)%4)*4))*86400000);
+  }
+  return r;
+}
+const detail = grades.map((s,i)=>{
+  const f=_entries(firstTerm[i],_pool1,2026,1,27,i);
+  if(f.length) f[f.length-1].type="Входно равнище";
+  return { name:s.n, annual:annual[i], second:_entries(s.g,_pool2,2026,6,25,i), first:f };
+});
 
 // Reviews: [praise(Похвали), remarks(Забележки)]
 const reviews = [
@@ -270,9 +378,12 @@ const notifs = [
 ];
 
 /* ============ STATE ============ */
-let state = { tab:"diary", sub:"abs", picked:true };
+let state = { tab:"diary", sub:"abs", picked:true, period:"second", periodPicker:false, detailIdx:null };
 // tab: picker | diary | disc | notif | more
 // sub (diary): abs | grades | rev | sched | hw
+// period: first | second | annual
+
+const periodLabel = {first:"Първи Срок", second:"Втори Срок", annual:"Срочни/годишни"};
 
 /* ============ ICONS ============ */
 const ic = {
@@ -285,7 +396,8 @@ const ic = {
   person:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>',
   envelope:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
   childfig:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="4.5" r="2.5"/><path d="M5 9h14v2.5h-4.5L17 21h-2.7l-2.3-6-2.3 6H7l2.5-9.5H5z"/></svg>',
-  bk:'&#128214;'
+  bk:'&#128214;',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>'
 };
 
 /* ============ HELPERS ============ */
@@ -304,6 +416,26 @@ function revBadge(val, kind){
 function renderChrome(){
   const tb = document.getElementById('topbar');
   const st = document.getElementById('subtabs');
+  tb.className = 'topbar';
+
+  if(state.detailIdx!=null){
+    const d = detail[state.detailIdx];
+    tb.className = 'topbar tall';
+    tb.innerHTML = `<div class="leftbtn" style="font-size:30px;font-weight:300;" onclick="closeDetail()">&#8249;</div>
+      <div class="dtitle">
+        <div class="l1"><span class="cf">${ic.childfig}</span> Мартин Стоилов 11А</div>
+        <div class="l2">${ic.bk} ${d.name}</div>
+      </div>`;
+    st.classList.add('hide');
+    return;
+  }
+
+  if(state.periodPicker){
+    tb.innerHTML = `<div class="leftbtn" style="font-size:30px;font-weight:300;" onclick="closePeriod()">&#8249;</div>
+      <div class="title">Избери</div>`;
+    st.classList.add('hide');
+    return;
+  }
 
   if(state.tab==='picker'){
     tb.innerHTML = `<div class="title"><span class="bookicon">${ic.book}</span> Дневник</div>`;
@@ -339,6 +471,17 @@ function renderContent(){
   c.scrollTop = 0;
   let h = '';
 
+  if(state.detailIdx!=null){ c.innerHTML = renderDetail(); return; }
+
+  if(state.periodPicker){
+    const opts = [['first','Първи Срок'],['second','Втори Срок'],['annual','Срочни/годишни']];
+    c.innerHTML = opts.map(o=>`
+      <div class="prow ${state.period===o[0]?'sel':''}" onclick="choosePeriod('${o[0]}')">
+        <span>${o[1]}</span>${state.period===o[0]?'<span class="mark">&minus;</span>':''}
+      </div>`).join('');
+    return;
+  }
+
   if(state.tab==='picker'){
     h = `<div class="pickhead">ИЗБЕРИ</div>
       <div class="pickrow" onclick="goDiary()">
@@ -358,13 +501,36 @@ function renderContent(){
       </div>`).join('');
   }
   else if(state.tab==='diary' && state.sub==='grades'){
-    h = `<div class="banner">Втори Срок <span class="chev">&#9662;</span></div>`;
-    h += grades.map(s=>`
-      <div class="srow">
-        <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
-        ${s.g.length ? `<div class="grades">${s.g.map(x=>`<span class="g g${x}">${x}</span>`).join('')}</div>`
-                     : `<div class="nomark">Няма оценки</div>`}
-      </div>`).join('');
+    h = `<div class="banner" onclick="openPeriod()">${periodLabel[state.period]} <span class="chev">&#9662;</span></div>`;
+
+    if(state.period==='annual'){
+      const cell=(lab,v)=>`<div class="acol"><span class="alabel">${lab}</span>${gcircle(v)}</div>`;
+      h += grades.map((s,i)=>{
+        const a = annual[i];
+        return `<div class="srow tap" onclick="openDetail(${i})">
+          <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
+          <div class="annual">${cell('Първи Срок',a.ps)}<div class="asep"></div>${cell('Втори Срок',a.vs)}<div class="asep"></div>${cell('Годишна',a.g)}</div>
+        </div>`;
+      }).join('');
+    }
+    else if(state.period==='first'){
+      h += grades.map((s,i)=>{
+        const fg = firstTerm[i];
+        return `<div class="srow tap" onclick="openDetail(${i})">
+          <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
+          ${fg.length ? `<div class="grades">${fg.map(x=>`<span class="g g${x}">${x}</span>`).join('')}</div>`
+                      : `<div class="nomark">Няма оценки</div>`}
+        </div>`;
+      }).join('');
+    }
+    else {
+      h += grades.map((s,i)=>`
+        <div class="srow tap" onclick="openDetail(${i})">
+          <div class="name"><span class="bk">${ic.bk}</span>${s.n}</div>
+          ${s.g.length ? `<div class="grades">${s.g.map(x=>`<span class="g g${x}">${x}</span>`).join('')}</div>`
+                       : `<div class="nomark">Няма оценки</div>`}
+        </div>`).join('');
+    }
   }
   else if(state.tab==='diary' && state.sub==='rev'){
     h = reviews.map(s=>`
@@ -419,6 +585,9 @@ function renderContent(){
 
 /* ============ BOTTOM NAV ============ */
 function renderTabbar(){
+  const bar = document.getElementById('tabbar');
+  if(state.periodPicker){ bar.style.display='none'; return; }
+  bar.style.display='flex';
   const tabs = [
     {k:'diary', label:'Дневник', i:ic.diary},
     {k:'disc', label:'Дискусии', i:ic.chat},
@@ -436,12 +605,42 @@ function renderTabbar(){
 
 /* ============ NAV ACTIONS ============ */
 function render(){ renderChrome(); renderContent(); renderTabbar(); }
+function gcircle(v){ return v==null ? `<span class="g gsm gempty"></span>` : `<span class="g gsm g${v}">${v}</span>`; }
+function openPeriod(){ state.periodPicker=true; render(); }
+function closePeriod(){ state.periodPicker=false; render(); }
+function choosePeriod(p){ state.period=p; state.periodPicker=false; render(); }
+function openDetail(i){ state.detailIdx=i; render(); }
+function closeDetail(){ state.detailIdx=null; render(); }
+
+function _gb(v){ return v==null ? `<span class="g gempty"></span>` : `<span class="g g${v}">${v}</span>`; }
+function _drow(e){
+  return `<div class="drowg">
+    ${e.g==null ? `<span class="g gempty"></span>` : `<span class="g g${e.g}">${e.g}</span>`}
+    <div class="info"><div class="ttl">${e.type}</div><div class="dt">${ic.cal} ${e.date}</div></div>
+    <span class="dchev">&#9662;</span>
+  </div>`;
+}
+function renderDetail(){
+  const d = detail[state.detailIdx];
+  let h = '';
+  h += `<div class="dhead"><span class="lab">Годишна оценка</span>${_gb(d.annual.g)}</div>`;
+  h += `<div class="dgap"></div>`;
+  h += `<div class="dhead"><span class="lab">Втори срок</span>${_gb(d.annual.vs)}</div>`;
+  h += d.second.length ? d.second.map(_drow).join('') : `<div class="nomark" style="padding:14px 18px;">Няма оценки</div>`;
+  h += `<div class="dgap"></div>`;
+  h += `<div class="dhead"><span class="lab">Първи срок</span>${_gb(d.annual.ps)}</div>`;
+  h += d.first.length ? d.first.map(_drow).join('') : `<div class="nomark" style="padding:14px 18px;">Няма оценки</div>`;
+  h += `<div class="dgap"></div>`;
+  return h;
+}
+
 function setTab(k){
+  state.periodPicker=false; state.detailIdx=null;
   if(k==='diary'){ state.tab = state.picked ? 'diary' : 'picker'; }
   else state.tab = k;
   render();
 }
-function setSub(k){ state.sub = k; render(); }
+function setSub(k){ state.periodPicker=false; state.detailIdx=null; state.sub = k; render(); }
 function goPicker(){ state.tab='picker'; render(); }
 function goDiary(){ state.picked=true; state.tab='diary'; state.sub='abs'; render(); }
 
